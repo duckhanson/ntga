@@ -7,7 +7,7 @@ notebooks/Disentangling_Trainability_and_Generalization.ipynb#scrollTo=aH1Zet-tu
 import os
 import argparse
 import jax.numpy as np
-from jax.api import grad, jit, vmap
+from jax import grad, jit, vmap
 from jax import lax, random
 from jax.config import config
 config.update('jax_enable_x64', True)

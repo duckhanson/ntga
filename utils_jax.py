@@ -1,7 +1,7 @@
 import jax.numpy as np
-from jax.api import grad, jit, vmap
+from jax import grad, jit, vmap
 from jax import lax
-from jax.experimental.stax import logsoftmax
+from jax.example_libraries.stax import logsoftmax
 from jax.config import config
 config.update('jax_enable_x64', True)
 
@@ -11,7 +11,7 @@ from neural_tangents import stax
 # -
 
 # Kernel Construction
-_Kernel = nt.utils.kernel.Kernel
+_Kernel = nt.Kernel
 
 def Kernel(K):
     """Create an input Kernel object out of an np.ndarray."""
