@@ -5,7 +5,7 @@ from jax import grad, jit, vmap
 from jax import random
 from jax.config import config
 config.update('jax_enable_x64', True)
-os.environ[XLA_PYTHON_CLIENT_PREALLOCATE']='false'
+os.environ['XLA_PYTHON_CLIENT_PREALLOCATE']='false'
 os.environ['XLA_PYTHON_CLIENT_MEM_FRACTION']='.10'
 from neural_tangents import stax
 
