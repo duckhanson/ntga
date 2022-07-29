@@ -44,7 +44,7 @@ ipython==7.26.0
 ipython-genutils==0.2.0
 ipywidgets==7.6.5
 jax==0.2.19
-jaxlib==0.1.70+cuda111     
+jaxlib==0.1.70+cuda111 @ https://storage.googleapis.com/jax-releases/jax_cuda_releases.html
 jedi==0.18.0
 Jinja2==3.0.1
 joblib==1.0.1
