@@ -20,7 +20,7 @@ parser = argparse.ArgumentParser(description="Generate NTGA attack!")
 parser.add_argument("--model_type", default="fnn", type=str, help="surrogate model. Choose either `fnn` or `cnn`")
 parser.add_argument("--dataset", required=True, type=str, help="dataset. `mnist`, `cifar10`, and `imagenet`\
                     are available. For ImageNet or other dataset, please modify the path in the code directly.")
-parser.add_argument("--val_size", default=10000, type=int, help="size of validation data")
+parser.add_argument("--val_size", default=100, type=int, help="size of validation data")
 parser.add_argument("--t", default=64, type=int, help="time step used to compute poisoned data")
 parser.add_argument("--eps", type=float, help="epsilon. Strength of NTGA")
 parser.add_argument("--nb_iter", default=10, type=int, help="number of iteration used to generate poisoned data")
@@ -57,7 +57,7 @@ else:
 eps_iter = (args.eps/args.nb_iter)*1.1
 
 seed = 0
-train_size = 2000
+train_size = 1000
 
 def surrogate_fn(model_type, W_std, b_std, num_classes):
     """
