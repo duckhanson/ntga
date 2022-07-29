@@ -57,7 +57,8 @@ else:
 eps_iter = (args.eps/args.nb_iter)*1.1
 
 seed = 0
-    
+train_size = 2000
+
 def surrogate_fn(model_type, W_std, b_std, num_classes):
     """
     :param model_type: string. `fnn` or `cnn`.
