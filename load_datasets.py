@@ -9,7 +9,7 @@ def _load(dataset_fn, save_path: str):
 
     train_data_size = int(len(train_val_data) * 0.8)
     valid_data_size = len(train_val_data) - train_data_size
-    train_data, valid_data = random_split(train_val_data, [train_data_size, valid_data_size])
+    train_data, val_data = random_split(train_val_data, [train_data_size, valid_data_size])
     print("===train data===")
     print(len(train_data))
     print("===val data===")
