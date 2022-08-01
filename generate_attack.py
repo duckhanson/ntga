@@ -13,7 +13,7 @@ from utils_generate_attack import surrogate_fn, model_fn, adv_loss
 
 
 if __name__ == "__main__":
-    train_data, test_data, eps, num_classes = load_datasets()
+    train_data, val_data, test_data, eps, num_classes = load_datasets()
 
     nb_iter = 10 # "number of iteration used to generate poisoned data"
     eps_iter = (eps/nb_iter)*1.1
@@ -27,5 +27,11 @@ if __name__ == "__main__":
     apply_fn = jit(apply_fn)
     kernel_fn = jit(kernel_fn, static_argnums=(2,))
     print("Finish Building model")
+
+    # grads_fn: a callable that takes an input tensor and a loss function, 
+    # and returns the gradient w.r.t. an input tensor.
+    grads_fn = jit(grad(adv_loss, argnums=0), static_argnums=(4, 5, 7))
+
+
 
 
