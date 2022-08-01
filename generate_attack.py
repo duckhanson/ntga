@@ -13,15 +13,15 @@ from load_datasets import load_datasets
 from utils_generate_attack import surrogate_fn, model_fn, adv_loss
 
 
-def main(t: int = 64, nb_iter: int = 10, model_type: str = 'fnn', batch_size: int = 64, dataset_name: str = 'cifar10', save_path: str ='/share/lucuslu/ntga/chlu/datasets'):
+def main(t: int = 64, nb_iter: int = 10, model_type: str = 'fnn', block_size: int = 512, batch_size: int = 32, dataset_name: str = 'cifar10', save_path: str ='/share/lucuslu/ntga/chlu/datasets'):
     """
     :param t: "time step used to compute poisoned data"
     :param model_type: "surrogate model backbone, either 'fnn' or 'cnn'"
     :param nb_iter: "number of iteration used to generate poisoned data"
-    :param :
+    :param block_size: "block size of B-NTGA"
     """
     # Load data
-    train_data, val_data, test_data, eps, num_classes = load_datasets(dataset_name=dataset_name, batch_size=batch_size, save_path=save_path)
+    train_data, val_data, test_data, eps, num_classes = load_datasets(dataset_name=dataset_name, batch_size=block_size, save_path=save_path)
 
     # eps: "epsilon. Strength of NTGA"
     # nb_iter: "number of iteration used to generate poisoned data"
