@@ -27,12 +27,15 @@ def load_datasets(dataset_name: str = 'cifar10', batch_size: int = 64, num_worke
     print("Loading dataset...")
     if dataset_name == 'cifar10':
         train_data, test_data = _load(datasets.CIFAR10)
+        num_classes = 10
         eps = 8/255
     elif dataset_name == 'imagenet':
         train_data, test_data = _load(datasets.ImageNet)
+        num_classes = 2
         eps = 0.1
     elif dataset_name == 'minst':
         train_data, test_data = _load(datasets.MNIST)
+        num_classes = 10
         eps = 0.3
     else:
         raise "Not support datasets"
@@ -48,4 +51,4 @@ def load_datasets(dataset_name: str = 'cifar10', batch_size: int = 64, num_worke
                                             drop_last=True,
                                             num_workers=num_workers)
     print("Fin Loading dataset (split into train, test)")
-    return train_loader, test_loader, eps
+    return train_loader, test_loader, eps, num_classes
