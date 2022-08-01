@@ -37,8 +37,6 @@ def load_datasets(dataset_name: str = 'cifar10', batch_size: int = 64, num_worke
     else:
         raise "Not support datasets"
 
-    eps_iter = (eps/nb_iter)*1.1
-
     train_loader = DataLoader(train_data,
                                             batch_size=batch_size,
                                             shuffle=True,
@@ -50,4 +48,4 @@ def load_datasets(dataset_name: str = 'cifar10', batch_size: int = 64, num_worke
                                             drop_last=True,
                                             num_workers=num_workers)
     print("Fin Loading dataset (split into train, test)")
-    return train_loader, test_loader, eps, eps_iter
+    return train_loader, test_loader, eps
