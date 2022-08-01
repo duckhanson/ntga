@@ -2,14 +2,14 @@ from torch.utils.data import DataLoader, random_split
 from torchvision import datasets
 from torchvision.transforms import ToTensor
 
-def _load(dataset_fn = None, save_path: str = '/share/lucuslu/ntga/chlu/datasets'):
+def _load(dataset_fn, save_path: str):
     train_val_data = dataset_fn(root=save_path, train=True, download=True, transform=ToTensor())
     print("===train_val data===")
     print(train_val_data)
 
-    train_set_size = int(len(train_set) * 0.8)
-    valid_set_size = len(train_set) - train_set_size
-    train_set, valid_set = data.random_split(train_val_data, [train_set_size, valid_set_size])
+    train_data_size = int(len(train_val_data) * 0.8)
+    valid_data_size = len(train_val_data) - train_data_size
+    train_data, valid_data = data.random_split(train_val_data, [train_data_size, valid_data_size])
     print("===train data===")
     print(len(train_data))
     print("===val data===")
