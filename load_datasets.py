@@ -2,8 +2,8 @@ from torch.utils.data import DataLoader, random_split
 from torchvision import datasets
 from torchvision.transforms import ToTensor
 
-def _load(dataset_fn):
-    train_val_data = dataset_fn(root='/share/lucuslu/ntga/chlu/datasets', train=True, download=True, transform=ToTensor())
+def _load(dataset_fn = None, save_path: str = '/share/lucuslu/ntga/chlu/datasets'):
+    train_val_data = dataset_fn(root=save_path, train=True, download=True, transform=ToTensor())
     print("===train_val data===")
     print(train_val_data)
 
@@ -15,13 +15,13 @@ def _load(dataset_fn):
     print("===val data===")
     print(len(val_data))
 
-    test_data = dataset_fn('/share/lucuslu/ntga/chlu/datasets', train=False, download=True, transform=ToTensor())
+    test_data = dataset_fn(root=save_path, train=False, download=True, transform=ToTensor())
     print("===test data===")
     print(test_data)
 
     return train_data, val_data, test_data
 
-def load_datasets(dataset_name: str = 'cifar10', batch_size: int = 64, num_workers: int = 16):
+def load_datasets(dataset_name: str = 'cifar10', batch_size: int = 64, num_workers: int = 16, save_path: str = '/share/lucuslu/ntga/chlu/datasets'):
     """
     :param dataset_name: string. `cifar10`, `imagenet` or `mnist`.
     :param batch_size: int.
@@ -34,15 +34,15 @@ def load_datasets(dataset_name: str = 'cifar10', batch_size: int = 64, num_worke
     """
     print("Loading dataset...")
     if dataset_name == 'cifar10':
-        train_data, val_data, test_data = _load(datasets.CIFAR10)
+        train_data, val_data, test_data = _load(datasets.CIFAR10, save_path)
         num_classes = 10
         eps = 8/255
     elif dataset_name == 'imagenet':
-        train_data, val_data, test_data = _load(datasets.ImageNet)
+        train_data, val_data, test_data = _load(datasets.ImageNet, save_path)
         num_classes = 2
         eps = 0.1
     elif dataset_name == 'minst':
-        train_data, val_data, test_data = _load(datasets.MNIST)
+        train_data, val_data, test_data = _load(datasets.MNIST, save_path)
         num_classes = 10
         eps = 0.3
     else:
