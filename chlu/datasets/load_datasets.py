@@ -8,4 +8,4 @@ data_loader = torch.utils.data.DataLoader(cifar10_data,
                                           drop_last=True,
                                           num_workers=2)
 
-print(cifar10_data.shape)
+print(cifar10_data)
