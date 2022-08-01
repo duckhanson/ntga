@@ -1,3 +1,4 @@
+import torch
 import torchvision
 
 cifar10_data = torchvision.datasets.CIFAR10('/share/lucuslu/ntga/chlu/datasets', download=True)
