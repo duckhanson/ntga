@@ -141,3 +141,8 @@ Thumbs.db
 *.npy
 ~/*
 *.xml
+*.meta
+*-batches-py/*
+*.tar.gz
+*.log
+*.yml
