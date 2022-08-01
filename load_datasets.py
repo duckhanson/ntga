@@ -19,7 +19,8 @@ def _load(dataset_fn, save_path: str):
     print("===test data===")
     print(test_data)
 
-    return train_data, val_data, test_data
+
+    return train_data[:2000], val_data[:800], test_data[:200]
 
 def load_datasets(dataset_name: str = 'cifar10', batch_size: int = 64, num_workers: int = 16, save_path: str = '/share/lucuslu/ntga/chlu/datasets'):
     """
