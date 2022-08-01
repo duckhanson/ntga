@@ -1,3 +1,4 @@
+import neural_tangents as nt
 from neural_tangents import stax
 from models.dnn_infinite import DenseGroup
 from models.cnn_infinite import ConvGroup
