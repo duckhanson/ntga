@@ -46,6 +46,11 @@ def main(t: int = 64, nb_iter: int = 10, model_type: str = 'fnn', batch_size: in
     x_train_adv = []
     y_train_adv = []
     for batch, ((_x_train, _y_train), (x_val, y_val)) in tqdm(enumerate(zip(train_data, val_data))):
+        print(_x_train)
+        print(_x_train.detach().numpy())
+        print(_y_train)
+        print(_y_train.detach().numpy())
+
         _x_train_adv = projected_gradient_descent(model_fn=model_fn, kernel_fn=kernel_fn, grads_fn=grads_fn, 
                                                   x_train=_x_train.detach().numpy(), y_train=_y_train.detach().numpy(), x_test=x_val.detach().numpy(), y_test=y_val.detach().numpy(), 
                                                   t=t, loss='cross-entropy', eps=eps, eps_iter=eps_iter, 
