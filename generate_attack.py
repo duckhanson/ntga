@@ -13,7 +13,7 @@ from load_datasets import load_datasets
 from utils_generate_attack import surrogate_fn, model_fn, adv_loss
 
 
-def main(t: int = 64, nb_iter: int = 10, model_type: str = 'fnn', block_size: int = 512, batch_size: int = 32, dataset_name: str = 'cifar10', save_path: str ='/share/lucuslu/ntga/chlu/datasets'):
+def main(t: int = 64, nb_iter: int = 10, model_type: str = 'fnn', block_size: int = 512, batch_size: int = 15, dataset_name: str = 'cifar10', save_path: str ='/share/lucuslu/ntga/chlu/datasets'):
     """
     :param t: "time step used to compute poisoned data"
     :param model_type: "surrogate model backbone, either 'fnn' or 'cnn'"
