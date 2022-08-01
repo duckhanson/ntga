@@ -31,9 +31,11 @@ def load_datasets(dataset_name: str = 'cifar10', batch_size: int = 64, num_worke
     elif dataset_name == 'imagenet':
         train_data = _load(datasets.ImageNet)
         eps = 0.1
-    else dataset_name == 'minst':
+    elif dataset_name == 'minst':
         train_data = _load(datasets.MNIST)
         eps = 0.3
+    else:
+        raise "Not support datasets"
 
     eps_iter = (eps/nb_iter)*1.1
 
