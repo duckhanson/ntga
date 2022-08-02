@@ -1,5 +1,6 @@
 import os
 os.environ['XLA_PYTHON_CLIENT_PREALLOCATE']='false'
+
 os.environ['TF_FORCE_UNIFIED_MEMORY']='1'
 
 import jax 
