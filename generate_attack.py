@@ -1,4 +1,8 @@
 import os
+os.environ['XLA_PYTHON_CLIENT_PREALLOCATE']='false'
+os.environ['XLA_PYTHON_CLIENT_MEM_FRACTION']='.10'
+
+
 from tqdm import tqdm
 import jax.numpy as np
 from jax import grad, jit, vmap
@@ -11,6 +15,7 @@ from utils import *
 from utils_jax import *
 from load_datasets import load_datasets
 from utils_generate_attack import surrogate_fn, model_fn, adv_loss
+
 
 
 def main(t: int = 64, nb_iter: int = 10, model_type: str = 'fnn', block_size: int = 512, batch_size: int = 15, dataset_name: str = 'mnist', save_path: str ='/share/lucuslu/ntga/chlu/datasets'):
