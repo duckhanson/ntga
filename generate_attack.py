@@ -21,7 +21,7 @@ def main(t: int = 64, nb_iter: int = 10, model_type: str = 'fnn', block_size: in
     :param block_size: "block size of B-NTGA"
     """
     # Load data
-    train_data, val_data, test_data, eps, num_classes = load_datasets(dataset_name=dataset_name, batch_size=block_size, save_path=save_path)
+    train_data, val_data, test_data, eps, num_classes = load_datasets(dataset_name=dataset_name, batch_size=1, save_path=save_path)
 
     # eps: "epsilon. Strength of NTGA"
     # nb_iter: "number of iteration used to generate poisoned data"
