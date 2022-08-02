@@ -98,6 +98,8 @@ def _one_hot(x, k, dtype=onp.float32):
     """Create a one-hot encoding of x of size k."""
     return onp.array(x[:, None] == onp.arange(k), dtype)
 
+def onp_flatten(x):
+    return _flatten(x)
 
 def get_dataset(name, n_train=None, n_test=None, permute_train=False, flatten=False, normalize=False):
     """Download, parse and process a dataset to unit scale and one-hot labels."""
