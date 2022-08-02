@@ -2,6 +2,8 @@ import neural_tangents as nt
 from neural_tangents import stax
 from models.dnn_infinite import DenseGroup
 from models.cnn_infinite import ConvGroup
+from utils import *
+from utils_jax import *
 
 def surrogate_fn(model_type, W_std, b_std, num_classes):
     """
