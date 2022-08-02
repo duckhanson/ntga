@@ -2,6 +2,10 @@ from torch.utils.data import DataLoader, random_split
 from torch import flatten
 from torchvision import datasets
 from torchvision.transforms import ToTensor
+import numpy as np
+
+def _to_numpy(dataset):
+    return np.array(list(dataset))
 
 def _load(dataset_fn, save_path: str):
     train_val_data = dataset_fn(root=save_path, train=True, download=True, transform=ToTensor())
@@ -70,4 +74,10 @@ def load_datasets(dataset_name: str = 'mnist', batch_size: int = 1, num_workers:
                                             drop_last=True,
                                             num_workers=num_workers)
     print("Fin Loading dataset (split into train, test)")
-    return train_loader, val_loader, test_loader, eps, num_classes
+    
+    # change into numpy
+    train_dataset = _to_numpy(train_loader)
+    val_dataset = _to_numpy(val_loader)
+    test_dataset = _to_numpy(test_loader)
+    
+    return train_dataset, val_dataset, test_dataset, eps, num_classes
