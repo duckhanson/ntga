@@ -44,7 +44,7 @@ def main(t: int = 64, nb_iter: int = 10, model_type: str = 'fnn', block_size: in
     print("Generating NTGA....")
     
     def _to_numpy(data_tensor):
-        return data_tensor.detach().numpy()
+        return _flatten(data_tensor.detach().numpy())
 
     x_train_adv = []
     y_train_adv = []
