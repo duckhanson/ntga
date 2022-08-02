@@ -1,4 +1,15 @@
-import tensorflow as tf
-import tensorflow.keras as k
+import jax 
+import numpy
 
-print(tf.config.list_physical_devices('GPU'))
+a = jax.numpy.array([[ 1.01290589e-03,  2.75272126e-05, -2.69166597e-04,
+        -5.58780779e-06],
+       [ 2.75272126e-05,  1.34740128e-03, -4.34192721e-06,
+        -3.00849575e-04],
+       [-2.69166597e-04, -4.34192721e-06,  1.28766222e-04,
+         7.41944929e-07],
+       [-5.58780779e-06, -3.00849575e-04,  7.41944929e-07,
+         7.99537441e-05]])
+
+numpy.linalg.cholesky(a)   # ok
+
+jax.numpy.linalg.cholesky(a)   # NOk
