@@ -1,3 +1,7 @@
+import os
+os.environ['XLA_PYTHON_CLIENT_PREALLOCATE']='false'
+# os.environ['XLA_PYTHON_CLIENT_MEM_FRACTION']='.10'
+
 import jax 
 import numpy
 
