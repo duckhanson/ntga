@@ -25,7 +25,7 @@ def _load(dataset_fn, save_path: str):
     
     return train_data, val_data, test_data
 
-def load_datasets(dataset_name: str = 'cifar10', batch_size: int = 1, num_workers: int = 16, save_path: str = '/share/lucuslu/ntga/chlu/datasets'):
+def load_datasets(dataset_name: str = 'mnist', batch_size: int = 1, num_workers: int = 16, save_path: str = '/share/lucuslu/ntga/chlu/datasets'):
     """
     :param dataset_name: string. `cifar10`, `imagenet` or `mnist`.
     :param batch_size: int.
@@ -45,7 +45,7 @@ def load_datasets(dataset_name: str = 'cifar10', batch_size: int = 1, num_worker
         train_data, val_data, test_data = _load(datasets.ImageNet, save_path)
         num_classes = 2
         eps = 0.1
-    elif dataset_name == 'minst':
+    elif dataset_name == 'mnist':
         train_data, val_data, test_data = _load(datasets.MNIST, save_path)
         num_classes = 10
         eps = 0.3
