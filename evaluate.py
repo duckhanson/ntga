@@ -229,8 +229,6 @@ def main():
     else:
         raise ValueError("To load custom dataset, please modify the code directly.")
     
-    train_size = 2000
-
     if args.x_train_path and args.y_train_path:
         x_train = onp.load(args.x_train_path)
         y_train = onp.load(args.y_train_path)

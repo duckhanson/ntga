@@ -177,52 +177,52 @@ def main():
     key = random.PRNGKey(0)
     b_std, W_std = np.sqrt(0.18), np.sqrt(1.76) # Standard deviation of initial biases and weights
     init_fn, apply_fn, kernel_fn = surrogate_fn(args.model_type, W_std, b_std, num_classes)
-    apply_fn = jit(apply_fn)
-    kernel_fn = jit(kernel_fn, static_argnums=(2,))
+    # apply_fn = jit(apply_fn)
+    # kernel_fn = jit(kernel_fn, static_argnums=(2,))
     
-    # grads_fn: a callable that takes an input tensor and a loss function, 
-    # and returns the gradient w.r.t. an input tensor.
-    grads_fn = jit(grad(adv_loss, argnums=0), static_argnums=(4, 5, 7))
+    # # grads_fn: a callable that takes an input tensor and a loss function, 
+    # # and returns the gradient w.r.t. an input tensor.
+    # grads_fn = jit(grad(adv_loss, argnums=0), static_argnums=(4, 5, 7))
     
-    # Generate Neural Tangent Generalization Attacks (NTGA)
-    print("Generating NTGA....")
-    epoch = int(x_train.shape[0]/args.block_size)
-    x_train_adv = []
-    y_train_adv = []
-    for idx in tqdm(range(epoch)):
-        _x_train = x_train[idx*args.block_size:(idx+1)*args.block_size]
-        _y_train = y_train[idx*args.block_size:(idx+1)*args.block_size]
-        _x_train_adv = projected_gradient_descent(model_fn=model_fn, kernel_fn=kernel_fn, grads_fn=grads_fn, 
-                                                  x_train=_x_train, y_train=_y_train, x_test=x_val, y_test=y_val, 
-                                                  t=args.t, loss='cross-entropy', eps=args.eps, eps_iter=eps_iter, 
-                                                  nb_iter=args.nb_iter, clip_min=0, clip_max=1, batch_size=args.batch_size)
+    # # Generate Neural Tangent Generalization Attacks (NTGA)
+    # print("Generating NTGA....")
+    # epoch = int(x_train.shape[0]/args.block_size)
+    # x_train_adv = []
+    # y_train_adv = []
+    # for idx in tqdm(range(epoch)):
+    #     _x_train = x_train[idx*args.block_size:(idx+1)*args.block_size]
+    #     _y_train = y_train[idx*args.block_size:(idx+1)*args.block_size]
+    #     _x_train_adv = projected_gradient_descent(model_fn=model_fn, kernel_fn=kernel_fn, grads_fn=grads_fn, 
+    #                                               x_train=_x_train, y_train=_y_train, x_test=x_val, y_test=y_val, 
+    #                                               t=args.t, loss='cross-entropy', eps=args.eps, eps_iter=eps_iter, 
+    #                                               nb_iter=args.nb_iter, clip_min=0, clip_max=1, batch_size=args.batch_size)
 
-        x_train_adv.append(_x_train_adv)
-        y_train_adv.append(_y_train)
+    #     x_train_adv.append(_x_train_adv)
+    #     y_train_adv.append(_y_train)
 
-        # Performance of clean and poisoned data
-        _, y_pred = model_fn(kernel_fn=kernel_fn, x_train=_x_train, x_test=x_test, y_train=_y_train)
-        print("Clean Acc: {:.2f}".format(accuracy(y_pred, y_test)))
-        _, y_pred = model_fn(kernel_fn=kernel_fn, x_train=x_train_adv[-1], x_test=x_test, y_train=y_train_adv[-1])
-        print("NTGA Robustness: {:.2f}".format(accuracy(y_pred, y_test)))
+    #     # Performance of clean and poisoned data
+    #     _, y_pred = model_fn(kernel_fn=kernel_fn, x_train=_x_train, x_test=x_test, y_train=_y_train)
+    #     print("Clean Acc: {:.2f}".format(accuracy(y_pred, y_test)))
+    #     _, y_pred = model_fn(kernel_fn=kernel_fn, x_train=x_train_adv[-1], x_test=x_test, y_train=y_train_adv[-1])
+    #     print("NTGA Robustness: {:.2f}".format(accuracy(y_pred, y_test)))
     
-    # Save poisoned data
-    x_train_adv = np.concatenate(x_train_adv)
-    y_train_adv = np.concatenate(y_train_adv)
+    # # Save poisoned data
+    # x_train_adv = np.concatenate(x_train_adv)
+    # y_train_adv = np.concatenate(y_train_adv)
     
-    if args.dataset == "mnist":
-        x_train_adv = x_train_adv.reshape(-1, 28, 28, 1)
-    elif args.dataset == "cifar10":
-        x_train_adv = x_train_adv.reshape(-1, 32, 32, 3)
-    elif args.dataset == "imagenet":
-        x_train_adv = x_train_adv.reshape(-1, 224, 224, 3)
-    else:
-        raise ValueError("Please specify the image size manually.")
+    # if args.dataset == "mnist":
+    #     x_train_adv = x_train_adv.reshape(-1, 28, 28, 1)
+    # elif args.dataset == "cifar10":
+    #     x_train_adv = x_train_adv.reshape(-1, 32, 32, 3)
+    # elif args.dataset == "imagenet":
+    #     x_train_adv = x_train_adv.reshape(-1, 224, 224, 3)
+    # else:
+    #     raise ValueError("Please specify the image size manually.")
     
-    if not os.path.exists(args.save_path):
-        os.makedirs(args.save_path)
-    np.save('{:s}x_train_{:s}_ntga_{:s}.npy'.format(args.save_path, args.dataset, args.model_type), x_train_adv)
-    np.save('{:s}y_train_{:s}_ntga_{:s}.npy'.format(args.save_path, args.dataset, args.model_type), y_train_adv)
+    # if not os.path.exists(args.save_path):
+    #     os.makedirs(args.save_path)
+    # np.save('{:s}x_train_{:s}_ntga_{:s}.npy'.format(args.save_path, args.dataset, args.model_type), x_train_adv)
+    # np.save('{:s}y_train_{:s}_ntga_{:s}.npy'.format(args.save_path, args.dataset, args.model_type), y_train_adv)
     print("================== Successfully generate NTGA! ==================")
 
 if __name__ == "__main__":

@@ -35,6 +35,7 @@ def surrogate_fn(model_type, W_std, b_std, num_classes):
                                                        stax.Dense(num_classes, W_std, b_std))
     else:
         raise ValueError
+    print(kernel_fn)
     return init_fn, apply_fn, kernel_fn
 
 def model_fn(kernel_fn, x_train=None, x_test=None, fx_train_0=0., fx_test_0=0., t=None, y_train=None, diag_reg=1e-4):
