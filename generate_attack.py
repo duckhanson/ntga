@@ -1,3 +1,10 @@
+from tqdm import tqdm
+from utils_jax import *
+from utils import *
+from attacks.projected_gradient_descent import projected_gradient_descent
+from models.cnn_infinite import ConvGroup
+from models.dnn_infinite import DenseGroup
+from neural_tangents import stax
 import os
 import argparse
 import jax.numpy as np
@@ -5,28 +12,27 @@ from jax import grad, jit, vmap
 from jax import random
 from jax.config import config
 config.update('jax_enable_x64', True)
-os.environ['XLA_PYTHON_CLIENT_PREALLOCATE']='false'
-os.environ['XLA_PYTHON_CLIENT_MEM_FRACTION']='.10'
-from neural_tangents import stax
+os.environ['XLA_PYTHON_CLIENT_PREALLOCATE'] = 'false'
+os.environ['XLA_PYTHON_CLIENT_MEM_FRACTION'] = '.10'
 
-from models.dnn_infinite import DenseGroup
-from models.cnn_infinite import ConvGroup
-from attacks.projected_gradient_descent import projected_gradient_descent
-from utils import *
-from utils_jax import *
-from tqdm import tqdm
 
 parser = argparse.ArgumentParser(description="Generate NTGA attack!")
-parser.add_argument("--model_type", default="fnn", type=str, help="surrogate model. Choose either `fnn` or `cnn`")
+parser.add_argument("--model_type", default="fnn", type=str,
+                    help="surrogate model. Choose either `fnn` or `cnn`")
 parser.add_argument("--dataset", required=True, type=str, help="dataset. `mnist`, `cifar10`, and `imagenet`\
                     are available. For ImageNet or other dataset, please modify the path in the code directly.")
-parser.add_argument("--val_size", default=100, type=int, help="size of validation data")
-parser.add_argument("--t", default=64, type=int, help="time step used to compute poisoned data")
+parser.add_argument("--val_size", default=100, type=int,
+                    help="size of validation data")
+parser.add_argument("--t", default=64, type=int,
+                    help="time step used to compute poisoned data")
 parser.add_argument("--eps", type=float, help="epsilon. Strength of NTGA")
-parser.add_argument("--nb_iter", default=10, type=int, help="number of iteration used to generate poisoned data")
-parser.add_argument("--block_size", default=512, type=int, help="block size of B-NTGA")
+parser.add_argument("--nb_iter", default=10, type=int,
+                    help="number of iteration used to generate poisoned data")
+parser.add_argument("--block_size", default=512,
+                    type=int, help="block size of B-NTGA")
 parser.add_argument("--batch_size", default=30, type=int, help="batch size")
-parser.add_argument("--save_path", default="", type=str, help="path to save poisoned data")
+parser.add_argument("--save_path", default="", type=str,
+                    help="path to save poisoned data")
 parser.add_argument("--cuda_visible_devices", default="0", type=str, help="specify which GPU to run \
                     an application on")
 
@@ -53,11 +59,13 @@ elif args.dataset == "imagenet":
     args.eps = 0.1
     print("For ImageNet, please specify the file path manually.")
 else:
-    raise ValueError("To load custom dataset, please modify the code directly.")
+    raise ValueError(
+        "To load custom dataset, please modify the code directly.")
 eps_iter = (args.eps/args.nb_iter)*1.1
 
 seed = 0
 train_size = 1000
+
 
 def surrogate_fn(model_type, W_std, b_std, num_classes):
     """
@@ -73,24 +81,30 @@ def surrogate_fn(model_type, W_std, b_std, num_classes):
                     which computes the kernel matrix
     """
     if model_type == "fnn":
-        init_fn, apply_fn, kernel_fn = stax.serial(DenseGroup(5, 512, W_std, b_std))
+        init_fn, apply_fn, kernel_fn = stax.serial(
+            DenseGroup(5, 512, W_std, b_std))
     elif model_type == "cnn":
         if args.dataset == 'imagenet':
             init_fn, apply_fn, kernel_fn = stax.serial(ConvGroup(2, 64, (3, 3), W_std, b_std),
                                                        stax.Flatten(),
-                                                       stax.Dense(384, W_std, b_std),
-                                                       stax.Dense(192, W_std, b_std),
+                                                       stax.Dense(
+                                                           384, W_std, b_std),
+                                                       stax.Dense(
+                                                           192, W_std, b_std),
                                                        stax.Dense(num_classes, W_std, b_std))
         else:
             init_fn, apply_fn, kernel_fn = stax.serial(ConvGroup(2, 64, (2, 2), W_std, b_std),
                                                        stax.Flatten(),
-                                                       stax.Dense(384, W_std, b_std),
-                                                       stax.Dense(192, W_std, b_std),
+                                                       stax.Dense(
+                                                           384, W_std, b_std),
+                                                       stax.Dense(
+                                                           192, W_std, b_std),
                                                        stax.Dense(num_classes, W_std, b_std))
     else:
         raise ValueError
     return init_fn, apply_fn, kernel_fn
-    
+
+
 def model_fn(kernel_fn, x_train=None, x_test=None, fx_train_0=0., fx_test_0=0., t=None, y_train=None, diag_reg=1e-4):
     """
     :param kernel_fn: a callable that takes an input tensor and returns the kernel matrix.
@@ -115,10 +129,12 @@ def model_fn(kernel_fn, x_train=None, x_test=None, fx_train_0=0., fx_test_0=0., 
     # Kernel
     ntk_train_train = kernel_fn(x_train, x_train, 'ntk')
     ntk_test_train = kernel_fn(x_test, x_train, 'ntk')
-    
+
     # Prediction
-    predict_fn = nt.predict.gradient_descent_mse(ntk_train_train, y_train, diag_reg=diag_reg)
+    predict_fn = nt.predict.gradient_descent_mse(
+        ntk_train_train, y_train, diag_reg=diag_reg)
     return predict_fn(t, fx_train_0, fx_test_0, ntk_test_train)
+
 
 def adv_loss(x_train, x_test, y_train, y_test, kernel_fn, loss='mse', t=None, targeted=False, diag_reg=1e-4):
     """
@@ -148,42 +164,47 @@ def adv_loss(x_train, x_test, y_train, y_test, kernel_fn, loss='mse', t=None, ta
     # Kernel
     ntk_train_train = kernel_fn(x_train, x_train, 'ntk')
     ntk_test_train = kernel_fn(x_test, x_train, 'ntk')
-    
+
     # Prediction
-    predict_fn = nt.predict.gradient_descent_mse(ntk_train_train, y_train, diag_reg=diag_reg)
+    predict_fn = nt.predict.gradient_descent_mse(
+        ntk_train_train, y_train, diag_reg=diag_reg)
     fx = predict_fn(t, 0., 0., ntk_test_train)[1]
-    
+
     # Loss
     if loss == 'cross-entropy':
         loss = cross_entropy_loss(fx, y_test)
     elif loss == 'mse':
         loss = mse_loss(fx, y_test)
-        
+
     if targeted:
-        loss = -loss        
+        loss = -loss
     return loss
-    
+
+
 def main():
     # Prepare dataset
     # For ImageNet, please specify the file path manually
     print("Loading dataset...")
-    x_train_all, y_train_all, x_test, y_test = tuple(np.array(x) for x in get_dataset(args.dataset, None, None, flatten=flatten))
+    x_train_all, y_train_all, x_test, y_test = tuple(np.array(x) for x in get_dataset(
+        args.dataset, args.save_path, None, None, flatten=flatten))
     x_train_all, y_train_all = shaffle(x_train_all, y_train_all, seed)
     x_train, x_val = x_train_all[:train_size], x_train_all[train_size:train_size+args.val_size]
     y_train, y_val = y_train_all[:train_size], y_train_all[train_size:train_size+args.val_size]
-    
+
     # Build model
     print("Building model...")
     key = random.PRNGKey(0)
-    b_std, W_std = np.sqrt(0.18), np.sqrt(1.76) # Standard deviation of initial biases and weights
-    init_fn, apply_fn, kernel_fn = surrogate_fn(args.model_type, W_std, b_std, num_classes)
+    # Standard deviation of initial biases and weights
+    b_std, W_std = np.sqrt(0.18), np.sqrt(1.76)
+    init_fn, apply_fn, kernel_fn = surrogate_fn(
+        args.model_type, W_std, b_std, num_classes)
     # apply_fn = jit(apply_fn)
     # kernel_fn = jit(kernel_fn, static_argnums=(2,))
-    
-    # # grads_fn: a callable that takes an input tensor and a loss function, 
+
+    # # grads_fn: a callable that takes an input tensor and a loss function,
     # # and returns the gradient w.r.t. an input tensor.
     # grads_fn = jit(grad(adv_loss, argnums=0), static_argnums=(4, 5, 7))
-    
+
     # # Generate Neural Tangent Generalization Attacks (NTGA)
     # print("Generating NTGA....")
     # epoch = int(x_train.shape[0]/args.block_size)
@@ -192,9 +213,9 @@ def main():
     # for idx in tqdm(range(epoch)):
     #     _x_train = x_train[idx*args.block_size:(idx+1)*args.block_size]
     #     _y_train = y_train[idx*args.block_size:(idx+1)*args.block_size]
-    #     _x_train_adv = projected_gradient_descent(model_fn=model_fn, kernel_fn=kernel_fn, grads_fn=grads_fn, 
-    #                                               x_train=_x_train, y_train=_y_train, x_test=x_val, y_test=y_val, 
-    #                                               t=args.t, loss='cross-entropy', eps=args.eps, eps_iter=eps_iter, 
+    #     _x_train_adv = projected_gradient_descent(model_fn=model_fn, kernel_fn=kernel_fn, grads_fn=grads_fn,
+    #                                               x_train=_x_train, y_train=_y_train, x_test=x_val, y_test=y_val,
+    #                                               t=args.t, loss='cross-entropy', eps=args.eps, eps_iter=eps_iter,
     #                                               nb_iter=args.nb_iter, clip_min=0, clip_max=1, batch_size=args.batch_size)
 
     #     x_train_adv.append(_x_train_adv)
@@ -205,11 +226,11 @@ def main():
     #     print("Clean Acc: {:.2f}".format(accuracy(y_pred, y_test)))
     #     _, y_pred = model_fn(kernel_fn=kernel_fn, x_train=x_train_adv[-1], x_test=x_test, y_train=y_train_adv[-1])
     #     print("NTGA Robustness: {:.2f}".format(accuracy(y_pred, y_test)))
-    
+
     # # Save poisoned data
     # x_train_adv = np.concatenate(x_train_adv)
     # y_train_adv = np.concatenate(y_train_adv)
-    
+
     # if args.dataset == "mnist":
     #     x_train_adv = x_train_adv.reshape(-1, 28, 28, 1)
     # elif args.dataset == "cifar10":
@@ -218,12 +239,13 @@ def main():
     #     x_train_adv = x_train_adv.reshape(-1, 224, 224, 3)
     # else:
     #     raise ValueError("Please specify the image size manually.")
-    
+
     # if not os.path.exists(args.save_path):
     #     os.makedirs(args.save_path)
     # np.save('{:s}x_train_{:s}_ntga_{:s}.npy'.format(args.save_path, args.dataset, args.model_type), x_train_adv)
     # np.save('{:s}y_train_{:s}_ntga_{:s}.npy'.format(args.save_path, args.dataset, args.model_type), y_train_adv)
     print("================== Successfully generate NTGA! ==================")
+
 
 if __name__ == "__main__":
     main()
