@@ -123,8 +123,10 @@ def get_dataset(name, data_dir, n_train=None, n_test=None, permute_train=False, 
             split=['train' + ('[:%d]' % n_train if n_train is not None else ''),
                    'test' + ('[:%d]' % n_test if n_test is not None else '')],
             batch_size=-1,
-            as_dataset_kwargs={'shuffle_files': False}),
-        data_dir=data_dir)
+            as_dataset_kwargs={'shuffle_files': False},
+            data_dir=data_dir
+        )
+    )
 
     train_images, train_labels, test_images, test_labels = (ds_train['image'],
                                                             ds_train['label'],
